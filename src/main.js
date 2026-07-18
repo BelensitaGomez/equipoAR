@@ -45,15 +45,11 @@ scene.add(light);
 const loader = new GLTFLoader();
 
 loader.load(
-    '/modelo.glb',
+    `${import.meta.env.BASE_URL}modelo.glb`,
 
-    function (gltf) {
+    function(gltf){
 
         const modelo = gltf.scene;
-
-        modelo.scale.set(1,1,1);
-
-        modelo.position.set(0,0,0);
 
         scene.add(modelo);
 
@@ -61,7 +57,7 @@ loader.load(
 
     undefined,
 
-    function (error) {
+    function(error){
 
         console.error(error);
 
