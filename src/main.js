@@ -5,6 +5,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { ARButton } from 'three/examples/jsm/webxr/ARButton.js';
 
+let modelo = null;
+
 const scene = new THREE.Scene();
 scene.background = null;
 
@@ -35,9 +37,15 @@ renderer.xr.addEventListener("sessionstart", () => {
 
     console.log("✅ Sesión AR iniciada");
 
-    alert("AR iniciada");
-
     controls.enabled = false;
+
+    if(modelo){
+
+        modelo.position.set(0,0,-1.5);
+
+        modelo.scale.set(0.4,0.4,0.4);
+
+    }
 
 });
 
@@ -78,7 +86,7 @@ loader.load(
 
         console.log("✅ Modelo cargado");
 
-        const modelo = gltf.scene;
+        modelo = gltf.scene;
 
         console.log(modelo);
 
