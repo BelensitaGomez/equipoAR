@@ -5,9 +5,12 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { ARButton } from 'three/examples/jsm/webxr/ARButton.js';
 
-let modelo = null;
+
 
 // ===== Variables WebXR =====
+let modelo = null;
+
+let hitPose = null;
 
 let hitTestSource = null;
 
@@ -153,9 +156,29 @@ loader.load(
 
 camera.position.z = 3;
 
-renderer.setAnimationLoop(() => {
+renderer.setAnimationLoop((time, frame) => {
 
     controls.update();
+
+    if (frame && hitTestSource && localSpace) {
+
+        const hitTestResults = frame.getHitTestResults(hitTestSource);
+
+        if (hitTestResults.length > 0) {
+
+            const hit = hitTestResults[0];
+
+            hitPose = hit.getPose(localSpace);
+
+            if (hitPose) {
+
+                console.log("✅ Superficie detectada");
+
+            }
+
+        }
+
+    }
 
     renderer.render(scene, camera);
 
