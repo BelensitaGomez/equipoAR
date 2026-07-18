@@ -43,17 +43,35 @@ const arButton = ARButton.createButton(renderer, {
 
 document.body.appendChild(arButton);
 
-renderer.xr.addEventListener("sessionstart", () => {
+renderer.xr.addEventListener("sessionstart", async () => {
 
     console.log("✅ Sesión AR iniciada");
 
     controls.enabled = false;
 
-    if(modelo){
+    const session = renderer.xr.getSession();
 
-        modelo.position.set(0,0,-1.5);
+    if (!hitTestSourceRequested) {
 
-        modelo.scale.set(0.4,0.4,0.4);
+        try {
+
+            viewerSpace = await session.requestReferenceSpace('viewer');
+
+            localSpace = await session.requestReferenceSpace('local');
+
+            hitTestSource = await session.requestHitTestSource({
+                space: viewerSpace
+            });
+
+            hitTestSourceRequested = true;
+
+            console.log("✅ Hit Test inicializado");
+
+        } catch (error) {
+
+            console.error("❌ Error al inicializar Hit Test:", error);
+
+        }
 
     }
 
@@ -64,6 +82,14 @@ renderer.xr.addEventListener("sessionend", () => {
     console.log("❌ Sesión AR finalizada");
 
     controls.enabled = true;
+
+    hitTestSourceRequested = false;
+
+    hitTestSource = null;
+
+    viewerSpace = null;
+
+    localSpace = null;
 
 });
 
