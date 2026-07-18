@@ -48,37 +48,11 @@ const arButton = ARButton.createButton(renderer, {
 
 document.body.appendChild(arButton);
 
-renderer.xr.addEventListener("sessionstart", async () => {
+renderer.xr.addEventListener("sessionstart", () => {
 
     console.log("✅ Sesión AR iniciada");
 
     controls.enabled = false;
-
-    const session = renderer.xr.getSession();
-
-    if (!hitTestSourceRequested) {
-
-        try {
-
-            viewerSpace = await session.requestReferenceSpace('viewer');
-
-            localSpace = await session.requestReferenceSpace('local');
-
-            hitTestSource = await session.requestHitTestSource({
-                space: viewerSpace
-            });
-
-            hitTestSourceRequested = true;
-
-            console.log("✅ Hit Test inicializado");
-
-        } catch (error) {
-
-            console.error("❌ Error al inicializar Hit Test:", error);
-
-        }
-
-    }
 
 });
 
@@ -111,7 +85,7 @@ controls.minDistance = 1;
 
 controls.maxDistance = 30;
 
-// Luz
+
 // ===== Retículo =====
 const geometry = new THREE.RingGeometry(0.08, 0.1, 32);
 geometry.rotateX(-Math.PI / 2);
@@ -174,6 +148,44 @@ renderer.setAnimationLoop((time, frame) => {
 
     controls.update();
 
+    if (frame) {
+
+    const session = renderer.xr.getSession();
+
+    if (!hitTestSourceRequested) {
+
+        session.requestReferenceSpace('viewer').then((space) => {
+
+            viewerSpace = space;
+
+            session.requestHitTestSource({
+                space: viewerSpace
+            }).then((source) => {
+
+                hitTestSource = source;
+
+            });
+
+        });
+
+        session.requestReferenceSpace('local').then((space) => {
+
+            localSpace = space;
+
+        });
+
+        session.addEventListener('end', () => {
+
+            hitTestSourceRequested = false;
+            hitTestSource = null;
+
+        });
+
+        hitTestSourceRequested = true;
+
+    }
+
+}
     if (frame && hitTestSource && localSpace) {
 
         const hitTestResults = frame.getHitTestResults(hitTestSource);
