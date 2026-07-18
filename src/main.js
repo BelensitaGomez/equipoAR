@@ -7,6 +7,16 @@ import { ARButton } from 'three/examples/jsm/webxr/ARButton.js';
 
 let modelo = null;
 
+// ===== Variables WebXR =====
+
+let hitTestSource = null;
+
+let localSpace = null;
+
+let viewerSpace = null;
+
+let hitTestSourceRequested = false;
+
 const scene = new THREE.Scene();
 scene.background = null;
 
