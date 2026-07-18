@@ -12,6 +12,8 @@ let modelo = null;
 
 let hitPose = null;
 
+let reticle;
+
 let hitTestSource = null;
 
 let localSpace = null;
@@ -110,10 +112,22 @@ controls.minDistance = 1;
 controls.maxDistance = 30;
 
 // Luz
-const light = new THREE.HemisphereLight(0xffffff, 0x444444, 3);
-scene.add(light);
+// ===== Retículo =====
+const geometry = new THREE.RingGeometry(0.08, 0.1, 32);
+geometry.rotateX(-Math.PI / 2);
 
-// Cargar modelo
+const material = new THREE.MeshBasicMaterial({
+    color: 0xffffff
+});
+
+reticle = new THREE.Mesh(geometry, material);
+
+reticle.matrixAutoUpdate = false;
+
+reticle.visible = false;
+
+scene.add(reticle);
+
 // Cargar modelo
 const loader = new GLTFLoader();
 
@@ -172,11 +186,17 @@ renderer.setAnimationLoop((time, frame) => {
 
             if (hitPose) {
 
-                console.log("✅ Superficie detectada");
+                reticle.visible = true;
+
+                reticle.matrix.fromArray(hitPose.transform.matrix);
 
             }
-
         }
+            else {
+
+                reticle.visible = false;
+
+            }
 
     }
 
