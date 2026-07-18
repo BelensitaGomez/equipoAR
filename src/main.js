@@ -6,7 +6,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { ARButton } from 'three/examples/jsm/webxr/ARButton.js';
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xf0f0f0);
+scene.background = null;
 
 const camera = new THREE.PerspectiveCamera(
     75,
@@ -15,17 +15,42 @@ const camera = new THREE.PerspectiveCamera(
     1000
 );
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.xr.enabled = true;
+renderer.setClearColor(0x000000,0);
 
 document.body.appendChild(renderer.domElement);
-document.body.appendChild(
-    ARButton.createButton(renderer, {
-        requiredFeatures: ['hit-test']
-    })
-);
+const arButton = ARButton.createButton(renderer, {
+    requiredFeatures: ['hit-test'],
+    optionalFeatures: ['dom-overlay'],
+    domOverlay: {
+        root: document.body
+    }
+});
+
+document.body.appendChild(arButton);
+
+renderer.xr.addEventListener("sessionstart", () => {
+
+    console.log("✅ Sesión AR iniciada");
+
+    alert("AR iniciada");
+
+    controls.enabled = false;
+
+});
+
+renderer.xr.addEventListener("sessionend", () => {
+
+    console.log("❌ Sesión AR finalizada");
+
+    controls.enabled = true;
+
+});
+
 const controls = new OrbitControls(camera, renderer.domElement);
+controls.enabled = true;
 
 controls.enableDamping = true;
 
@@ -42,24 +67,41 @@ const light = new THREE.HemisphereLight(0xffffff, 0x444444, 3);
 scene.add(light);
 
 // Cargar modelo
+// Cargar modelo
 const loader = new GLTFLoader();
 
 loader.load(
+
     `${import.meta.env.BASE_URL}modelo.glb`,
 
     function(gltf){
 
+        console.log("✅ Modelo cargado");
+
         const modelo = gltf.scene;
+
+        console.log(modelo);
+
+        modelo.scale.set(1,1,1);
+
+        modelo.position.set(0,0,0);
 
         scene.add(modelo);
 
     },
 
-    undefined,
+    function(xhr){
+
+        console.log(
+            "Progreso:",
+            (xhr.loaded / xhr.total * 100).toFixed(2) + "%"
+        );
+
+    },
 
     function(error){
 
-        console.error(error);
+        console.error("ERROR:", error);
 
     }
 
