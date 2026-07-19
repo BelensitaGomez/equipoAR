@@ -53,27 +53,49 @@ renderer.xr.addEventListener("sessionstart", async () => {
 
     const session = renderer.xr.getSession();
 
-    if (!hitTestSourceRequested) {
+    try {
 
-        try {
+        viewerSpace = await session.requestReferenceSpace("viewer");
 
-            viewerSpace = await session.requestReferenceSpace('viewer');
+        localSpace = await session.requestReferenceSpace("local");
 
-            localSpace = await session.requestReferenceSpace('local');
+        hitTestSource = await session.requestHitTestSource({
+            space: viewerSpace
+        });
 
-            hitTestSource = await session.requestHitTestSource({
-                space: viewerSpace
-            });
+        modeloColocado = false;
 
-            modeloColocado = false;
+        console.log("✅ Hit Test inicializado");
 
-            console.log("✅ Hit Test inicializado");
+        // Cuando el usuario toque la pantalla
+        session.addEventListener("select", () => {
 
-        } catch (error) {
+            if (!reticle.visible || !modelo || modeloColocado) return;
 
-            console.error("❌ Error al inicializar Hit Test:", error);
+            // Posición del retículo
+            modelo.position.setFromMatrixPosition(reticle.matrix);
 
-        }
+            // Escala del modelo
+            modelo.scale.set(0.25, 0.25, 0.25);
+
+            // Mantener orientación
+            modelo.rotation.set(0, 0, 0);
+
+            // Mostrar modelo
+            modelo.visible = true;
+
+            // Ocultar retículo
+            reticle.visible = false;
+
+            modeloColocado = true;
+
+            console.log("✅ Modelo colocado");
+
+        });
+
+    } catch (error) {
+
+        console.error("❌ Error al inicializar Hit Test:", error);
 
     }
 
@@ -111,8 +133,25 @@ controls.maxDistance = 30;
 // Luz
 const light = new THREE.HemisphereLight(0xffffff, 0x444444, 3);
 scene.add(light);
+// ===========================
+// Retículo de colocación
+// ===========================
 
-// Cargar modelo
+const reticleGeometry = new THREE.RingGeometry(0.08, 0.12, 32);
+reticleGeometry.rotateX(-Math.PI / 2);
+
+const reticleMaterial = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    side: THREE.DoubleSide
+});
+
+const reticle = new THREE.Mesh(reticleGeometry, reticleMaterial);
+
+reticle.matrixAutoUpdate = false;
+reticle.visible = false;
+
+scene.add(reticle);
+
 // Cargar modelo
 const loader = new GLTFLoader();
 
@@ -126,12 +165,11 @@ loader.load(
 
         modelo = gltf.scene;
 
-        //console.log(modelo);
+        // Escala inicial (más pequeña)
+        modelo.scale.set(0.25, 0.25, 0.25);
 
-        modelo.scale.set(1,1,1);
-
-        // No mostrar el modelo todavía
-        modelo.visible = true;
+        // Mantener oculto hasta que el usuario toque la pantalla
+        modelo.visible = false;
 
         scene.add(modelo);
 
@@ -164,36 +202,26 @@ renderer.setAnimationLoop((time, frame) => {
 
         const hitTestResults = frame.getHitTestResults(hitTestSource);
 
-        if (hitTestResults.length > 0) {
+if (hitTestResults.length > 0) {
 
-            const hit = hitTestResults[0];
-            const hitPose = hit.getPose(localSpace);
+    const hit = hitTestResults[0];
+    const hitPose = hit.getPose(localSpace);
 
-            if (hitPose) {
+    if (hitPose) {
 
-                const position = new THREE.Vector3();
+        // Mostrar el retículo
+        reticle.visible = true;
 
-                position.setFromMatrixPosition(
-                    new THREE.Matrix4().fromArray(hitPose.transform.matrix)
-                );
+        // Colocarlo sobre la superficie detectada
+        reticle.matrix.fromArray(hitPose.transform.matrix);
 
-                // Mostrar el modelo
-                modelo.visible = true;
+    }
 
-                // Colocarlo una sola vez
-                modelo.position.copy(position);
+} else {
 
-                // Mantener la orientación original
-                modelo.rotation.set(0, 0, 0);
+    reticle.visible = false;
 
-                // Ya quedó colocado
-                modeloColocado = true;
-
-                console.log("✅ Modelo colocado");
-
-            }
-
-        }
+}
 
     }
 
