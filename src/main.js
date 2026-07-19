@@ -44,14 +44,17 @@ const arButton = ARButton.createButton(renderer, {
 });
 
 document.body.appendChild(arButton);
-// Personalizar botón
-arButton.style.backgroundColor = "#f01212"; // Azul
-arButton.style.color = "#FFFFFF";           // Texto blanco
-arButton.style.border = "none";
-arButton.style.borderRadius = "12px";
-arButton.style.padding = "12px 24px";
-arButton.style.fontSize = "16px";
-arButton.style.fontWeight = "bold";
+// Esperar a que el botón se agregue y luego cambiar su estilo
+setTimeout(() => {
+    arButton.style.background = "#1976D2";
+    arButton.style.color = "#FFFFFF";
+    arButton.style.border = "none";
+    arButton.style.borderRadius = "30px";
+    arButton.style.padding = "14px 28px";
+    arButton.style.fontSize = "18px";
+    arButton.style.fontWeight = "bold";
+    arButton.style.opacity = "1";
+}, 0);
 
 renderer.xr.addEventListener("sessionstart", async () => {
 
