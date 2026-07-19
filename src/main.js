@@ -134,7 +134,7 @@ loader.load(
         modelo.scale.set(1,1,1);
 
         // No mostrar el modelo todavía
-        modelo.visible = false;
+        modelo.visible = true;
 
         scene.add(modelo);
 
@@ -167,34 +167,41 @@ renderer.setAnimationLoop((time, frame) => {
 
         const hitTestResults = frame.getHitTestResults(hitTestSource);
 
-        if (hitTestResults.length > 0) {
+// Solo mostrar este mensaje una vez
+if (!window.debugHitTest) {
 
-            const hit = hitTestResults[0];
+    console.log("HitTestResults:", hitTestResults.length);
 
-            hitPose = hit.getPose(localSpace);
+    window.debugHitTest = true;
 
-            if (hitPose) {
+}
 
-                // Obtener posición y orientación de la superficie
-                const position = new THREE.Vector3();
-                const quaternion = new THREE.Quaternion();
-                const scale = new THREE.Vector3();
+if (hitTestResults.length > 0) {
 
-                new THREE.Matrix4()
-                    .fromArray(hitPose.transform.matrix)
-                    .decompose(position, quaternion, scale);
+    console.log("✅ Se detectó una superficie");
 
-                // Colocar el modelo sobre la superficie
-                modelo.position.copy(position);
-                modelo.quaternion.copy(quaternion);
+    const hit = hitTestResults[0];
 
-                // Si el pivote del modelo está centrado,
-                // puedes descomentar esta línea para subirlo un poco.
-                // modelo.position.y += 0.05;
+    hitPose = hit.getPose(localSpace);
 
-            }
+    if (hitPose) {
 
-        }
+        const position = new THREE.Vector3();
+        const quaternion = new THREE.Quaternion();
+        const scale = new THREE.Vector3();
+
+        new THREE.Matrix4()
+            .fromArray(hitPose.transform.matrix)
+            .decompose(position, quaternion, scale);
+
+        modelo.visible = true;
+
+        modelo.position.copy(position);
+        modelo.quaternion.copy(quaternion);
+
+    }
+
+}
 
     }
 
