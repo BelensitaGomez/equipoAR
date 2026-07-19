@@ -8,8 +8,6 @@ import { ARButton } from 'three/examples/jsm/webxr/ARButton.js';
 
 
 // ===== Variables WebXR =====
-let modeloColocado = false;
-
 let modelo = null;
 
 let hitPose = null;
@@ -189,23 +187,8 @@ renderer.setAnimationLoop((time, frame) => {
             if (hitPose) {
 
                 reticle.visible = true;
+
                 reticle.matrix.fromArray(hitPose.transform.matrix);
-
-             if (modelo) {
-
-                const matrix = new THREE.Matrix4();
-                matrix.fromArray(hitPose.transform.matrix);
-
-                modelo.position.setFromMatrixPosition(reticle.matrix);
-
-                modelo.quaternion.setFromRotationMatrix(reticle.matrix);
-
-                // Ajusta la altura si el origen del modelo está en el centro
-                modelo.position.y += 0.02;
-
-                modeloColocado = true;
-
-        }
 
             }
         }
