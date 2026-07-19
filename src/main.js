@@ -184,20 +184,24 @@ if (hitTestResults.length > 0) {
 
     if (hitPose) {
 
-        const position = new THREE.Vector3();
-        const quaternion = new THREE.Quaternion();
-        const scale = new THREE.Vector3();
+    const position = new THREE.Vector3();
+    const quaternion = new THREE.Quaternion();
+    const scale = new THREE.Vector3();
 
-        new THREE.Matrix4()
-            .fromArray(hitPose.transform.matrix)
-            .decompose(position, quaternion, scale);
+    new THREE.Matrix4()
+        .fromArray(hitPose.transform.matrix)
+        .decompose(position, quaternion, scale);
 
-        modelo.visible = true;
+    modelo.visible = true;
 
-        modelo.position.copy(position);
-        modelo.quaternion.copy(quaternion);
+    // Colocar el modelo sobre la superficie
+    modelo.position.copy(position);
 
-    }
+    // Mantener la orientación original del modelo
+    // (No copiar la rotación del plano)
+    modelo.rotation.set(0, 0, 0);
+
+}
 
 }
 
