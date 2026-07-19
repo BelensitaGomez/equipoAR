@@ -188,19 +188,20 @@ renderer.setAnimationLoop((time, frame) => {
 
             if (hitPose) {
 
-                    reticle.visible = true;
-    reticle.matrix.fromArray(hitPose.transform.matrix);
+                reticle.visible = true;
+                reticle.matrix.fromArray(hitPose.transform.matrix);
 
-    if (modelo && !modeloColocado) {
+             if (modelo) {
 
-        modelo.position.setFromMatrixPosition(reticle.matrix);
+                modelo.position.setFromMatrixPosition(reticle.matrix);
+                modelo.quaternion.setFromRotationMatrix(reticle.matrix);
 
-        // Ajusta la altura si el origen del modelo está en el centro
-        modelo.position.y += 0.02;
+                // Ajusta la altura si el origen del modelo está en el centro
+                modelo.position.y += 0.02;
 
-        modeloColocado = true;
+                modeloColocado = true;
 
-    }
+        }
 
             }
         }
