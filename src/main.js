@@ -197,10 +197,10 @@ renderer.setAnimationLoop((time, frame) => {
                 matrix.fromArray(hitPose.transform.matrix);
 
                 // Posición
-                //modelo.position.setFromMatrixPosition(matrix);
+                modelo.position.setFromMatrixPosition(matrix);
 
                 // Rotación
-                //modelo.quaternion.setFromRotationMatrix(matrix);
+                modelo.quaternion.setFromRotationMatrix(matrix);
 
                 // Ajusta la altura si el origen del modelo está en el centro
                 modelo.position.y += 0.02;
