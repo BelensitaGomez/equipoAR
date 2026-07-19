@@ -25,6 +25,23 @@ let hitTestSourceRequested = false;
 const scene = new THREE.Scene();
 scene.background = null;
 
+// Luz ambiental
+const ambientLight = new THREE.AmbientLight(0xffffff, 2);
+scene.add(ambientLight);
+
+// Luz direccional
+const directionalLight = new THREE.DirectionalLight(0xffffff, 3);
+directionalLight.position.set(5, 10, 5);
+scene.add(directionalLight);
+
+// Luz hemisférica
+const hemisphereLight = new THREE.HemisphereLight(
+    0xffffff,
+    0xbbbbff,
+    2
+);
+scene.add(hemisphereLight);
+
 const camera = new THREE.PerspectiveCamera(
     75,
     window.innerWidth / window.innerHeight,
