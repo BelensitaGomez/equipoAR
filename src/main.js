@@ -10,6 +10,8 @@ import { ARButton } from 'three/examples/jsm/webxr/ARButton.js';
 // ===== Variables WebXR =====
 let modelo = null;
 
+let modeloColocado = false;
+
 let hitPose = null;
 
 let hitTestSource = null;
@@ -131,7 +133,8 @@ loader.load(
 
         modelo.scale.set(1,1,1);
 
-        modelo.position.set(0,0,0);
+        // No mostrar el modelo todavía
+        modelo.visible = false;
 
         scene.add(modelo);
 
@@ -160,7 +163,7 @@ renderer.setAnimationLoop((time, frame) => {
 
     controls.update();
 
-    if (frame && hitTestSource && localSpace) {
+    if (frame && hitTestSource && localSpace && modelo) {
 
         const hitTestResults = frame.getHitTestResults(hitTestSource);
 
@@ -172,7 +175,22 @@ renderer.setAnimationLoop((time, frame) => {
 
             if (hitPose) {
 
-                console.log("✅ Superficie detectada");
+                // Obtener posición y orientación de la superficie
+                const position = new THREE.Vector3();
+                const quaternion = new THREE.Quaternion();
+                const scale = new THREE.Vector3();
+
+                new THREE.Matrix4()
+                    .fromArray(hitPose.transform.matrix)
+                    .decompose(position, quaternion, scale);
+
+                // Colocar el modelo sobre la superficie
+                modelo.position.copy(position);
+                modelo.quaternion.copy(quaternion);
+
+                // Si el pivote del modelo está centrado,
+                // puedes descomentar esta línea para subirlo un poco.
+                // modelo.position.y += 0.05;
 
             }
 
