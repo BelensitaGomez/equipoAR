@@ -12,15 +12,12 @@ let modelo = null;
 
 let modeloColocado = false;
 
-let hitPose = null;
-
 let hitTestSource = null;
 
 let localSpace = null;
 
 let viewerSpace = null;
 
-let hitTestSourceRequested = false;
 
 const scene = new THREE.Scene();
 scene.background = null;
@@ -68,7 +65,7 @@ renderer.xr.addEventListener("sessionstart", async () => {
                 space: viewerSpace
             });
 
-            hitTestSourceRequested = true;
+            modeloColocado = false;
 
             console.log("✅ Hit Test inicializado");
 
@@ -88,13 +85,13 @@ renderer.xr.addEventListener("sessionend", () => {
 
     controls.enabled = true;
 
-    hitTestSourceRequested = false;
-
     hitTestSource = null;
 
     viewerSpace = null;
 
     localSpace = null;
+
+    modeloColocado = false;
 
 });
 
@@ -163,47 +160,40 @@ renderer.setAnimationLoop((time, frame) => {
 
     controls.update();
 
-    if (frame && hitTestSource && localSpace && modelo) {
+    if (frame && hitTestSource && localSpace && modelo && !modeloColocado) {
 
         const hitTestResults = frame.getHitTestResults(hitTestSource);
 
-// Solo mostrar este mensaje una vez
-if (!window.debugHitTest) {
+        if (hitTestResults.length > 0) {
 
-    console.log("HitTestResults:", hitTestResults.length);
+            const hit = hitTestResults[0];
+            const hitPose = hit.getPose(localSpace);
 
-}
+            if (hitPose) {
 
-if (hitTestResults.length > 0) {
+                const position = new THREE.Vector3();
 
-    console.log("✅ Se detectó una superficie");
+                position.setFromMatrixPosition(
+                    new THREE.Matrix4().fromArray(hitPose.transform.matrix)
+                );
 
-    const hit = hitTestResults[0];
+                // Mostrar el modelo
+                modelo.visible = true;
 
-    hitPose = hit.getPose(localSpace);
+                // Colocarlo una sola vez
+                modelo.position.copy(position);
 
-    if (hitPose) {
+                // Mantener la orientación original
+                modelo.rotation.set(0, 0, 0);
 
-    const position = new THREE.Vector3();
-    const quaternion = new THREE.Quaternion();
-    const scale = new THREE.Vector3();
+                // Ya quedó colocado
+                modeloColocado = true;
 
-    new THREE.Matrix4()
-        .fromArray(hitPose.transform.matrix)
-        .decompose(position, quaternion, scale);
+                console.log("✅ Modelo colocado");
 
-    modelo.visible = true;
+            }
 
-    // Colocar el modelo sobre la superficie
-    modelo.position.copy(position);
-
-    // Mantener la orientación original del modelo
-    // (No copiar la rotación del plano)
-    modelo.rotation.set(0, 0, 0);
-
-}
-
-}
+        }
 
     }
 
