@@ -25,23 +25,6 @@ let hitTestSourceRequested = false;
 const scene = new THREE.Scene();
 scene.background = null;
 
-// Luz ambiental
-const ambientLight = new THREE.AmbientLight(0xffffff, 2);
-scene.add(ambientLight);
-
-// Luz direccional
-const directionalLight = new THREE.DirectionalLight(0xffffff, 3);
-directionalLight.position.set(5, 10, 5);
-scene.add(directionalLight);
-
-// Luz hemisférica
-const hemisphereLight = new THREE.HemisphereLight(
-    0xffffff,
-    0xbbbbff,
-    2
-);
-scene.add(hemisphereLight);
-
 const camera = new THREE.PerspectiveCamera(
     75,
     window.innerWidth / window.innerHeight,
@@ -65,11 +48,37 @@ const arButton = ARButton.createButton(renderer, {
 
 document.body.appendChild(arButton);
 
-renderer.xr.addEventListener("sessionstart", () => {
+renderer.xr.addEventListener("sessionstart", async () => {
 
     console.log("✅ Sesión AR iniciada");
 
     controls.enabled = false;
+
+    const session = renderer.xr.getSession();
+
+    if (!hitTestSourceRequested) {
+
+        try {
+
+            viewerSpace = await session.requestReferenceSpace('viewer');
+
+            localSpace = await session.requestReferenceSpace('local');
+
+            hitTestSource = await session.requestHitTestSource({
+                space: viewerSpace
+            });
+
+            hitTestSourceRequested = true;
+
+            console.log("✅ Hit Test inicializado");
+
+        } catch (error) {
+
+            console.error("❌ Error al inicializar Hit Test:", error);
+
+        }
+
+    }
 
 });
 
@@ -134,9 +143,9 @@ loader.load(
 
         console.log(modelo);
 
-        modelo.scale.set(0.4, 0.4, 0.4);
+        modelo.scale.set(1,1,1);
 
-        modelo.position.set(0, -1.2, -2);
+        modelo.position.set(0,0,0);
 
         scene.add(modelo);
 
@@ -165,44 +174,6 @@ renderer.setAnimationLoop((time, frame) => {
 
     controls.update();
 
-    if (frame) {
-
-    const session = renderer.xr.getSession();
-
-    if (!hitTestSourceRequested) {
-
-        session.requestReferenceSpace('viewer').then((space) => {
-
-            viewerSpace = space;
-
-            session.requestHitTestSource({
-                space: viewerSpace
-            }).then((source) => {
-
-                hitTestSource = source;
-
-            });
-
-        });
-
-        session.requestReferenceSpace('local').then((space) => {
-
-            localSpace = space;
-
-        });
-
-        session.addEventListener('end', () => {
-
-            hitTestSourceRequested = false;
-            hitTestSource = null;
-
-        });
-
-        hitTestSourceRequested = true;
-
-    }
-
-}
     if (frame && hitTestSource && localSpace) {
 
         const hitTestResults = frame.getHitTestResults(hitTestSource);
