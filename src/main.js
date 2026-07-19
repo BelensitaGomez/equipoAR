@@ -193,8 +193,14 @@ renderer.setAnimationLoop((time, frame) => {
 
              if (modelo) {
 
-                modelo.position.setFromMatrixPosition(reticle.matrix);
-                modelo.quaternion.setFromRotationMatrix(reticle.matrix);
+                const matrix = new THREE.Matrix4();
+                matrix.fromArray(hitPose.transform.matrix);
+
+                // Posición
+                //modelo.position.setFromMatrixPosition(matrix);
+
+                // Rotación
+                //modelo.quaternion.setFromRotationMatrix(matrix);
 
                 // Ajusta la altura si el origen del modelo está en el centro
                 modelo.position.y += 0.02;
