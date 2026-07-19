@@ -172,8 +172,6 @@ if (!window.debugHitTest) {
 
     console.log("HitTestResults:", hitTestResults.length);
 
-    window.debugHitTest = true;
-
 }
 
 if (hitTestResults.length > 0) {
