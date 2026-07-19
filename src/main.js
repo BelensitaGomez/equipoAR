@@ -44,6 +44,14 @@ const arButton = ARButton.createButton(renderer, {
 });
 
 document.body.appendChild(arButton);
+// Personalizar botón
+arButton.style.backgroundColor = "#f01212"; // Azul
+arButton.style.color = "#FFFFFF";           // Texto blanco
+arButton.style.border = "none";
+arButton.style.borderRadius = "12px";
+arButton.style.padding = "12px 24px";
+arButton.style.fontSize = "16px";
+arButton.style.fontWeight = "bold";
 
 renderer.xr.addEventListener("sessionstart", async () => {
 
