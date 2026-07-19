@@ -129,7 +129,7 @@ loader.load(
 
         modelo = gltf.scene;
 
-        console.log(modelo);
+        //console.log(modelo);
 
         modelo.scale.set(1,1,1);
 
