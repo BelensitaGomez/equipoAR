@@ -117,9 +117,9 @@ loader.load(
 
         console.log(modelo);
 
-        modelo.scale.set(1,1,1);
+        modelo.scale.set(0.4, 0.4, 0.4);
 
-        modelo.position.set(0,0,0);
+        modelo.position.set(0, -1.2, -2);
 
         scene.add(modelo);
 
